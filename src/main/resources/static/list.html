@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product List</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Product List</h2>
+
+    <!-- UPDATE FORM -->
+    <div id="updateFormContainer" class="card p-4 mb-4 shadow" style="display:none;">
+        <h4>Update Product</h4>
+
+        <input type="hidden" id="updateId">
+
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <input type="text" id="updateName" class="form-control" placeholder="Name">
+            </div>
+            <div class="col-md-6 mb-2">
+                <input type="text" id="updateCategory" class="form-control" placeholder="Category">
+            </div>
+        </div>
+
+        <div class="mb-2">
+            <input type="text" id="updateDescription" class="form-control" placeholder="Description">
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-2">
+                <input type="number" id="updatePrice" class="form-control" placeholder="Price">
+            </div>
+            <div class="col-md-4 mb-2">
+                <input type="number" id="updateDiscount" class="form-control" placeholder="Discount">
+            </div>
+            <div class="col-md-4 mb-2">
+                <input type="number" id="updateQuantity" class="form-control" placeholder="Quantity">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-2">
+                <input type="number" id="updateWeight" class="form-control" placeholder="Weight">
+            </div>
+            <div class="col-md-4 mb-2">
+                <input type="text" id="updateUnit" class="form-control" placeholder="Unit">
+            </div>
+            <div class="col-md-4 mb-2">
+                <input type="date" id="updateManufacturingDate" class="form-control">
+            </div>
+        </div>
+
+        <div class="mb-2">
+            <input type="date" id="updateExpiryDate" class="form-control">
+        </div>
+
+        <button class="btn btn-success" onclick="updateProduct()">Save Changes</button>
+        <button class="btn btn-secondary" onclick="cancelUpdate()">Cancel</button>
+    </div>
+
+    <!-- TABLE -->
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Discount</th>
+                <th>Final Price</th>
+                <th>Quantity</th>
+                <th>Manufacturing Date</th>   
+                <th>Expiry Date</th>          
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="productTable"></tbody>
+    </table>
+</div>
+
+<script>
+const API_URL = "http://192.168.0.103:8080/products";
+
+// LOAD PRODUCTS
+function loadProducts() {
+    fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+            const table = document.getElementById("productTable");
+            table.innerHTML = "";
+
+            data.forEach(product => {
+                table.innerHTML += `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>${product.price}</td>
+                        <td>${product.discount}</td>
+                        <td>${product.finalPrice}</td>
+                        <td>${product.quantity}</td>
+                        <td>${product.manufacturingDate || ''}</td>   
+                        <td>${product.expiryDate || ''}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${product.id})">Delete</button>
+                            <button class="btn btn-warning btn-sm" onclick="editProduct(${product.id})">Update</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        })
+        .catch(err => console.error("Error loading products:", err));
+}
+
+// DELETE
+function deleteProduct(id) {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+    })
+    .then(() => {
+        alert("Product deleted");
+        loadProducts();
+    })
+    .catch(err => console.error("Delete error:", err));
+}
+
+// EDIT (OPEN FORM)
+function editProduct(id) {
+    fetch(`${API_URL}/${id}`)
+        .then(res => res.json())
+        .then(product => {
+
+            document.getElementById("updateFormContainer").style.display = "block";
+
+            // scroll to form
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            document.getElementById("updateId").value = product.id;
+            document.getElementById("updateName").value = product.name || "";
+            document.getElementById("updateCategory").value = product.category || "";
+            document.getElementById("updateDescription").value = product.description || "";
+            document.getElementById("updatePrice").value = product.price || 0;
+            document.getElementById("updateDiscount").value = product.discount || 0;
+            document.getElementById("updateQuantity").value = product.quantity || 0;
+            document.getElementById("updateWeight").value = product.weight || 0;
+            document.getElementById("updateUnit").value = product.unit || "";
+            document.getElementById("updateManufacturingDate").value = product.manufacturingDate || "";
+            document.getElementById("updateExpiryDate").value = product.expiryDate || "";
+        });
+}
+
+// UPDATE
+function updateProduct() {
+
+    const id = document.getElementById("updateId").value;
+
+    const updatedProduct = {
+        name: document.getElementById("updateName").value,
+        category: document.getElementById("updateCategory").value,
+        description: document.getElementById("updateDescription").value,
+        price: parseFloat(document.getElementById("updatePrice").value) || 0,
+        discount: parseFloat(document.getElementById("updateDiscount").value) || 0,
+        quantity: parseInt(document.getElementById("updateQuantity").value) || 0,
+        weight: parseFloat(document.getElementById("updateWeight").value) || 0,
+        unit: document.getElementById("updateUnit").value,
+        manufacturingDate: document.getElementById("updateManufacturingDate").value,
+        expiryDate: document.getElementById("updateExpiryDate").value
+    };
+
+    fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedProduct)
+    })
+    .then(() => {
+        alert("Product updated successfully!");
+        document.getElementById("updateFormContainer").style.display = "none";
+        loadProducts();
+    })
+    .catch(err => console.error("Update error:", err));
+}
+
+// CANCEL
+function cancelUpdate() {
+    document.getElementById("updateFormContainer").style.display = "none";
+}
+
+// INIT
+loadProducts();
+</script>
+
+</body>
+</html>
