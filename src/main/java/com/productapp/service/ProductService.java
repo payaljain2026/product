@@ -30,7 +30,35 @@ public class ProductService {
         return productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
     }
-
+    
+    
+    //READ BY category
+    public List<Product> getProductByCategory(String category) {
+		return productRepository.findByCategory(category);
+    }
+    
+    
+    //get product between price range
+    public List<Product> getProductsByPriceRange(double min, double max){
+    	return productRepository.findByPriceBetween(min, max);
+    }
+    
+    
+    //get in-stock products 
+    public List<Product> getInStockProducts() {
+        return productRepository.findByQuantityGreaterThan(0);
+    }
+    
+    //get out-of-stock products 
+    public List<Product> getOutOfStockProducts() {
+        return productRepository.findByQuantity(0);
+    }
+    
+    //get low stock products 
+    public List<Product> getLowStockProducts() {
+        return productRepository.findByQuantityLessThan(5);
+    }
+    
     // UPDATE
     public Product updateProduct(Long id, Product product) {
         Product existing = getProductById(id);
