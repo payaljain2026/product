@@ -62,6 +62,18 @@ public class ProductController {
     	return productService.getLowStockProducts();
     }
     
+    // total count
+    @GetMapping("/count")
+    public long getTotalCount() {
+        return productService.getTotalProductCount();
+    }
+
+    // count by category
+    @GetMapping("/count/category/{category}")
+    public long getCountByCategory(@PathVariable String category) {
+        return productService.getProductCountByCategory(category);
+    }
+    
     // UPDATE
     @PutMapping("/{id}")
     public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {

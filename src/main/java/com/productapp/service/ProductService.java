@@ -59,6 +59,16 @@ public class ProductService {
         return productRepository.findByQuantityLessThan(5);
     }
     
+    // total count
+    public long getTotalProductCount() {
+        return productRepository.count();
+    }
+
+    // count by category
+    public long getProductCountByCategory(String category) {
+        return productRepository.countByCategory(category);
+    }
+    
     // UPDATE
     public Product updateProduct(Long id, Product product) {
         Product existing = getProductById(id);
