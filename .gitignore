@@ -1,1 +1,15 @@
 /target/
+/.metadata/
+# Eclipse files
+.classpath
+.project
+.settings/
+
+# Build folder
+/target/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
