@@ -83,5 +83,15 @@ public class ProductService {
         productRepository.delete(product);
     }
     
+ // Main branch change
+ // Conflict test change
+//conflict created - main branch update line 90 - other branch update line 90  - at the time of merging conflict occurs 
+/*
+<<<<<<< HEAD
     // Main branch change
+=======
+   // Conflict test change
+    
+>>>>>>> feature/test-conflict
+*/
 }
