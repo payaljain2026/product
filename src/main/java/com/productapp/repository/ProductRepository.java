@@ -21,4 +21,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	
 	//low stock 
 	List<Product> findByQuantityLessThan(int quantity);
+
+	//count product by category
+	long countByCategory(String category);
 }
